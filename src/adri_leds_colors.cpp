@@ -2,6 +2,7 @@
 
 #include <FS.h>
 #include <arduino.h>
+#include <adri_tools.h>
 
 #define HSV_SECTION_3 (86)
 
@@ -11,6 +12,8 @@ int  		fx_doubleColor_pos 	= 0;
 
 RgbColor hsv2rgb (uint8_t h, uint8_t s, uint8_t v, int pix_nbr) {
 	//long start=micros();
+
+	// fsprintf("\nHSV_SECTION_3: %d\n", HSV_SECTION_3);
 	RgbColor rgb;
 
 	uint8_t value = v;
@@ -36,6 +39,7 @@ RgbColor hsv2rgb (uint8_t h, uint8_t s, uint8_t v, int pix_nbr) {
 	// add brightness_floor offset to everything
 	uint8_t rampup_adj_with_floor   = rampup_amp_adj   + brightness_floor;
 	uint8_t rampdown_adj_with_floor = rampdown_amp_adj + brightness_floor;
+	// fsprintf("\nsection: %d\n", section);
 
 	switch (section) {
 		case 0:
@@ -116,8 +120,19 @@ int* splitColor(String Val) {
 		// return CRGB(c1.R, c1.G, c1.B);	
 		 return ( ((uint32_t)c1.R << 16) | ((uint16_t)c1.G << 8 ) | (uint16_t)c1.B );
 	}
-
-
+	uint32_t rgb2_32(RgbColor c1) {
+		 return ( ((uint32_t)c1.R << 16) | ((uint16_t)c1.G << 8 ) | (uint16_t)c1.B );
+	}
+	uint32_t rgb2_32(uint8_t r, uint8_t g, uint8_t b) {
+		 return ( ((uint32_t)r << 16) | ((uint16_t)g << 8 ) | (uint16_t)b );
+	}	
+	String RGBToString(RgbColor c) {
+		String ret = "";
+		ret += String(c.R) + ".";
+		ret += String(c.G) + ".";
+		ret += String(c.B);
+		return ret;
+	}
 	String RGBtoString(CRGB c) {
 		String ret = "";
 		ret += String(c.r) + ".";
@@ -151,7 +166,27 @@ int* splitColor(String Val) {
 // #endif
 
 
+uint8_t WheelPos(int pos){
+   CRGB c = Wheel(pos);
+   HsvColor hsv = rgb2hsv(c.r, c.g, c.b);
+   return hsv.h; 
+}
 
 
+CRGB parsecolorEx(String Val) {
 
-
+    String      aVal            = Val;
+    byte        firstIndex      = aVal.indexOf('.');
+    byte        secondIndex     = aVal.indexOf('.', firstIndex + 1);
+    String      red             = aVal.substring(0, firstIndex);
+    String      green           = aVal.substring(firstIndex + 1, secondIndex);
+    String      blue            = aVal.substring(secondIndex + 1);
+    int         r               = red.toInt();
+    int         g               = green.toInt();
+    int         b               = blue.toInt();
+                r               = map(r, 0, 255, 0, 255);
+                g               = map(g, 0, 255, 0, 255);
+                b               = map(b, 0, 255, 0, 255);
+    
+	return CRGB(r, g, b);
+}
