@@ -1,8 +1,6 @@
 #include <adri_leds_colors.h>
 
-#include <FS.h>
 #include <arduino.h>
-#include <adri_tools.h>
 
 #define HSV_SECTION_3 (86)
 
